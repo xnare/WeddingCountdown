@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Wedding Countdown</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffffff;--card:#fffdfa;--ink:#5b3a2e;--rose:#e8913f;--gold:#b86a35;--soft:#fde6d0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2b1f19;--card:#3a2a21;--ink:#fbeadc;--rose:#f5b074;--gold:#e0975a;--soft:#4b362a}}
+:root[data-theme="dark"]{--bg:#2b1f19;--card:#3a2a21;--ink:#fbeadc;--rose:#f5b074;--gold:#e0975a;--soft:#4b362a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% 0,var(--soft),var(--bg) 60%);color:var(--ink);
+font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;text-align:center;min-height:100vh;overflow-x:hidden}
+.wrap{max-width:480px;margin:0 auto;padding:28px 18px 40px;position:relative;z-index:2}
+h1{font-family:'Great Vibes','Brush Script MT',cursive;font-weight:400;font-size:3rem;margin:.2em 0 0;color:var(--rose)}
+.date{letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-size:.9rem;margin-bottom:18px}
+.ring{font-size:3rem;cursor:pointer;display:inline-block;animation:pulse 2s infinite;user-select:none}
+@keyframes pulse{50%{transform:scale(1.12) rotate(6deg)}}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.box{background:var(--card);border:1.5px solid var(--gold);border-radius:18px;padding:14px 6px;box-shadow:0 4px 14px rgba(232,145,63,.2)}
+.box b{display:block;font-size:2.6rem;font-weight:600;color:var(--rose);font-variant-numeric:tabular-nums}
+.box span{font-size:.85rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.card{background:var(--card);border:1px dashed var(--gold);border-radius:18px;padding:14px;margin:14px 0}
+.card h2{margin:0 0 8px;font-family:'Great Vibes',cursive;font-weight:400;font-size:1.7rem;color:var(--gold)}
+.meter{height:16px;border-radius:99px;background:var(--soft);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--rose));transition:width 1s}
+button{font:inherit;font-weight:600;background:var(--rose);color:#fff;border:0;border-radius:99px;padding:10px 20px;margin:6px 3px 0;cursor:pointer}
+button.alt{background:var(--gold)}
+#quote{min-height:3.2em;font-style:italic}
+.fall{position:fixed;top:-40px;pointer-events:none;z-index:1;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+.up{position:fixed;bottom:-30px;pointer-events:none;z-index:5;animation:up 2.4s ease-out forwards}
+@keyframes up{to{transform:translate(var(--dx),-85vh) rotate(360deg);opacity:0}}
+
+.calm{border:2px solid var(--rose);background:linear-gradient(180deg,var(--card),var(--soft))}
+.calm button{font-size:1.05rem;padding:12px 22px}
+#breath{position:fixed;inset:0;z-index:20;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;
+padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+#breath.on{display:flex}
+.orb{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--rose));box-shadow:0 0 50px var(--rose);transform:scale(.6);transition:transform 4s ease-in-out}
+.orb.in{transform:scale(1.5)}.orb.hold{transform:scale(1.5);transition-duration:.3s}.orb.out{transform:scale(.6);transition-duration:6s}
+#bphase{font-family:'Great Vibes','Brush Script MT',cursive;font-size:2.6rem;color:var(--rose);margin:70px 0 6px}
+#bmsg{font-style:italic;max-width:320px;min-height:3.4em}
+.names{font-size:1.5rem;font-weight:600;color:var(--gold);margin:2px 0 6px}
+.fam{margin-top:26px;font-family:'Great Vibes','Brush Script MT',cursive;font-size:1.8rem;color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="ring" id="ring" title="Tipp mich!">💍</div>
+  <h1>Wedding Countdown</h1>
+  <div class="names">Alina &amp; Thomas heiraten!</div>
+  <div class="date">10. Oktober · 14:00 Uhr</div>
+
+  <div id="count" class="grid">
+    <div class="box"><b id="d">0</b><span>Tage</span></div>
+    <div class="box"><b id="h">0</b><span>Stunden</span></div>
+    <div class="box"><b id="m">0</b><span>Minuten</span></div>
+    <div class="box"><b id="s">0</b><span>Sekunden</span></div>
+  </div>
+  <div id="done" class="card" hidden><h2>Ja, ich will! 🧡</h2>Ihr seid verheiratet – herzlichen Glückwunsch!</div>
+
+  <div class="card calm">
+    <h2>Nervös? 🧡</h2>
+    <div style="margin-bottom:4px">Du schaffst das. Atme kurz mit mir durch.</div>
+    <button id="calmBtn">Klick hier, wenn du nervös wirst</button>
+  </div>
+
+  <div class="card">
+    <h2>Nervositäts-Meter</h2>
+    <div class="meter"><i id="nerv"></i></div>
+    <div id="nervTxt" style="margin-top:6px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Fun Facts</h2>
+    <div id="fact"></div>
+  </div>
+
+  <div class="card">
+    <h2>Ehe-Orakel 🔮</h2>
+    <div id="quote">Tipp auf den Button für weise Worte.</div>
+    <button id="oracle">Orakel befragen</button>
+    <button class="alt" id="boom">Konfetti 🎉</button>
+  </div>
+  <div class="fam">Familie Scheer 🧡</div>
+</div>
+
+<div id="breath">
+  <div class="orb" id="orb"></div>
+  <div id="bphase">Bereit?</div>
+  <div id="bmsg"></div>
+  <button id="bclose" style="margin-top:22px">Mir geht's besser 🧡</button>
+</div>
+
+<script>
+(function(){
+  // Zeitpunkt: 10.10.2026, 14:00 Uhr österreichische Zeit (MESZ = UTC+2)
+  var TARGET = new Date("2026-10-10T14:00:00+02:00").getTime();
+  var $ = function(id){return document.getElementById(id)};
+  var facts = [
+    function(t){return "💓 Dein Herz schlägt bis dahin noch ca. "+Math.round(t/60000*80).toLocaleString("de-AT")+" Mal."},
+    function(t){return "😴 Noch "+Math.max(0,Math.ceil(t/864e5))+" Mal schlafen – oder auch nicht, bei der Aufregung."},
+    function(t){return "☕ Das sind rund "+Math.round(t/36e5/4)+" Kaffees bis zum Ja-Wort."},
+    function(t){return "🥂 Bei einem Glas Sekt pro Stunde: "+Math.round(t/36e5)+" Gläser. Bitte nicht alle vorher."},
+    function(t){return "💃 Wenn du pro Tag 10 Minuten Eröffnungstanz übst: "+Math.max(0,Math.ceil(t/864e5)*10)+" Minuten Training übrig."}
+  ];
+  var quotes = [
+    "Die Ehe ist wie WLAN: Ohne Verbindung geht nichts.",
+    "Der Mann hat immer recht – wenn sie es sagt.",
+    "Happy wife, happy life. Happy husband? Auch gut.",
+    "Wer streitet, wer abwäscht? Entscheidet Schere-Stein-Papier.",
+    "Die Fernbedienung wird ab jetzt zum Gemeinschaftseigentum erklärt.",
+    "Tipp des Tages: Immer Taschentücher einpacken. Für alle.",
+    "Verheiratet heißt: Nie wieder alleine Pizza bestellen.",
+    "Die Schuhe dürfen drücken – das Herz nicht.",
+    "Liebe ist, wenn dir jemand das letzte Stück Torte überlässt.",
+    "Ab Samstag: Offiziell die bessere Hälfte von jemandem."
+  ];
+  var fi = 0;
+
+  function pad(n){return n<10?"0"+n:""+n}
+  function tick(){
+    var t = TARGET - Date.now();
+    if(t<=0){
+      $("count").hidden = true; $("done").hidden = false;
+      $("nerv").style.width="100%"; $("nervTxt").textContent="Geschafft! Jetzt wird gefeiert. 🎊";
+      return;
+    }
+    var s = Math.floor(t/1000);
+    $("d").textContent = Math.floor(s/86400);
+    $("h").textContent = pad(Math.floor(s%86400/3600));
+    $("m").textContent = pad(Math.floor(s%3600/60));
+    $("s").textContent = pad(s%60);
+    var days = t/864e5, pct = Math.min(100, Math.max(3, (1-days/30)*100));
+    $("nerv").style.width = pct+"%";
+    $("nervTxt").textContent = days>14?"Noch ganz entspannt 😌":days>7?"Leichtes Kribbeln 😬":days>2?"Ohje, Puls steigt 😅":days>0.5?"Gleich platzt das Herz 🥹":"Heute ist der Tag!!! 💖";
+    $("fact").textContent = facts[fi%facts.length](t);
+  }
+
+  function rain(){
+    var e = ["🍂","🍁","🧡","💗","🌸","🍑","✨","🍂"][Math.floor(Math.random()*5)];
+    var el = document.createElement("div");
+    el.className="fall"; el.textContent=e;
+    el.style.left=Math.random()*100+"vw";
+    el.style.fontSize=(14+Math.random()*16)+"px";
+    el.style.opacity=.55;
+    el.style.animationDuration=(7+Math.random()*6)+"s";
+    document.body.appendChild(el);
+    setTimeout(function(){el.remove()},13500);
+  }
+
+  function burst(n){
+    for(var k=0;k<4;k++){
+      var f=document.createElement("div");
+      f.className="up"; f.textContent="🦊";
+      f.style.left=(10+Math.random()*80)+"vw";
+      f.style.fontSize=(38+Math.random()*22)+"px";
+      f.style.setProperty("--dx",(Math.random()*160-80)+"px");
+      f.style.animationDelay=Math.random()*.6+"s";
+      document.body.appendChild(f);
+      setTimeout((function(x){return function(){x.remove()}})(f),3400);
+    }
+    var set=["🎉","🧡","💗","🌸","🌷","🥂","🍂","🍁","💍","🎊","🍑","🤍","🦊"];
+    for(var i=0;i<n;i++){
+      var el=document.createElement("div");
+      el.className="up"; el.textContent=set[Math.floor(Math.random()*set.length)];
+      el.style.left=Math.random()*100+"vw";
+      el.style.fontSize=(18+Math.random()*20)+"px";
+      el.style.setProperty("--dx",(Math.random()*120-60)+"px");
+      el.style.animationDelay=Math.random()*.5+"s";
+      document.body.appendChild(el);
+      setTimeout((function(x){return function(){x.remove()}})(el),3200);
+    }
+  }
+
+  $("oracle").onclick=function(){$("quote").textContent=quotes[Math.floor(Math.random()*quotes.length)]};
+  $("boom").onclick=function(){burst(40)};
+  $("ring").onclick=function(){burst(18); fi++; tick()};
+  $("fact").onclick=function(){fi++; tick()};
+  $("fact").style.cursor="pointer";
+  $("fact").title="Tipp für den nächsten Fun Fact";
+
+  var calmMsgs = [
+    "Es ist dein Tag. Es muss nicht perfekt sein – nur ehrlich.",
+    "Nervosität heißt nur: Dir ist das hier wichtig.",
+    "Was auch passiert: Am Ende seid ihr verheiratet.",
+    "Schultern runter, Kiefer locker. Alles gut.",
+    "Die Gäste sind für euch da, nicht um zu bewerten.",
+    "Ein kleiner Versprecher macht die Story nur besser."
+  ];
+  var bt=[], bon=false;
+  function later(f,ms){bt.push(setTimeout(f,ms))}
+  function phase(txt,cls){$("bphase").textContent=txt;$("orb").className="orb "+cls}
+  function cycle(n){
+    if(!bon) return;
+    if(n>=5){phase("Sehr gut.","");$("bmsg").textContent="Das war's. Du bist ruhiger als du denkst. 🧡";return}
+    $("bmsg").textContent=calmMsgs[n%calmMsgs.length];
+    phase("Einatmen …","in");
+    later(function(){phase("Halten …","hold")},4000);
+    later(function(){phase("Ausatmen …","out")},8000);
+    later(function(){cycle(n+1)},14000);
+  }
+  $("calmBtn").onclick=function(){bon=true;$("breath").className="on";phase("Bereit?","");later(function(){cycle(0)},800)};
+  $("bclose").onclick=function(){bon=false;bt.forEach(clearTimeout);bt=[];$("breath").className="";burst(14)};
+
+  tick(); setInterval(tick,1000);
+  setInterval(rain,900);
+  if(TARGET-Date.now()<=0) burst(50);
+})();
+</script>
+</body>
+</html>
